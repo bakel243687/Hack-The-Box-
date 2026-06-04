@@ -1,23 +1,25 @@
 # Bike
 
-![Bike](Challenges/Images/Bike/Screenshot_2026-06-03_01-40-48.png)
+![image alt](https://github.com/bakel243687/Hack-The-Box-/blob/16edf042bf589861202e6f952a7827f8bdb746eb/Challenges/Images/Bike/Screenshot_2026-06-03_01-40-48.png)
 
 Started up the machine and I was provided with an IP address
+
+![image alt](https://github.com/bakel243687/Hack-The-Box-/blob/16edf042bf589861202e6f952a7827f8bdb746eb/Challenges/Images/Bike/Screenshot_2026-06-03_01-51-52.png)
 
 I performed an nmap scan on the provided Ip address and got two open ports, an ssh/22 and an http/80
 
 With more details on the nmap scan, it was obvious that the system is running Node.js (Express Middlware) with a http-title called Bike.
 
 
-![Webpage](Challenges/Images/Bike/Screenshot_2026-06-03_01-41-26.png)
+![image alt](https://github.com/bakel243687/Hack-The-Box-/blob/16edf042bf589861202e6f952a7827f8bdb746eb/Challenges/Images/Bike/Screenshot_2026-06-03_01-41-26.png)
 
 upon pasting the IP address into the web browser, the page boots up with the title Bike.
 
-![Webpage](Challenges/Images/Bike/Screenshot_2026-06-03_01-41-43.png)
+![image alt](https://github.com/bakel243687/Hack-The-Box-/blob/16edf042bf589861202e6f952a7827f8bdb746eb/Challenges/Images/Bike/Screenshot_2026-06-03_01-41-43.png)
 
 There is only one input field which reflects your input when submitted and an information that the website is under construction. Well, this is good because with all the collected information, the vulnerability should be known already.
 
-Key info:
+## Key info:
 - Port 22 and 80
 - Node.js (Express Middleware) running on the website
 - An input field that reflects what was inputted back on the screen.
@@ -27,7 +29,7 @@ With the above information, the vulnerability we are working with is a Server Si
 
 Identifying the vulnerability is the easy part, now comes the hard part which is researching about the vulnerability. It's not every vulnerability that is known as a security researcher, so over time, we would have to be researching proof of concepts on several vulnerabilities.
 
-![](Challenges/Images/Bike/Screenshot_2026-06-03_01-42-22.png)
+![image alt](https://github.com/bakel243687/Hack-The-Box-/blob/16edf042bf589861202e6f952a7827f8bdb746eb/Challenges/Images/Bike/Screenshot_2026-06-03_01-42-22.png)
 
 I tried a couple of payloads to test the input field to know if it was indeed vulnerable.
 
@@ -44,7 +46,7 @@ I got an parse error which gave me the needed information to better understand h
 
 Now, I spent more than half a day researching this until I came across a website, [HackTrick](https://hacktricks.wiki/en/pentesting-web/ssti-server-side-template-injection/index.html#handlebars-nodejsl) which provided the needed payload which I didn't expect to be that long.
 
-![](Challenges/Images/Bike/Screenshot_2026-06-03_01-43-21.png)
+![image alt](https://github.com/bakel243687/Hack-The-Box-/blob/16edf042bf589861202e6f952a7827f8bdb746eb/Challenges/Images/Bike/Screenshot_2026-06-03_01-43-21.png)
 
 The payload utilized in this box was
 
@@ -74,10 +76,22 @@ URLencoded:
 
 ```
 
-![](Challenges/Images/Bike/Screenshot_2026-06-03_01-43-21.png)
+![image alt](https://github.com/bakel243687/Hack-The-Box-/blob/16edf042bf589861202e6f952a7827f8bdb746eb/Challenges/Images/Bike/Screenshot_2026-06-03_01-43-21.png)
 
 So, the URL encoding of the payload was what was used as seen in the images. Once you have tweaked the payload to your desired way, you can then encode it in burp suite or any encoder you prefer.
 
+![image alt](https://github.com/bakel243687/Hack-The-Box-/blob/16edf042bf589861202e6f952a7827f8bdb746eb/Challenges/Images/Bike/Screenshot_2026-06-03_01-44-07.png)
 
-![](Challenges/Images/Bike/Screenshot_2026-06-03_01-44-07.png)
+Concerning tweaking the payload, I encountered a Reference Error which got me thinking and researching yet again. 'require is not defined'
 
+With the knowledge gathered along the way, I changed 'require' to 'process.mainModule.require'. Why? So, 'require' looks for folders like node_modules starting from the directory of the current file while 'process.mainModule.require' executtes the resolution algorithm as if it were being called from your application's root entry file. I want to get root access and now, I know what would give me the root access.
+
+
+![image alt](https://github.com/bakel243687/Hack-The-Box-/blob/16edf042bf589861202e6f952a7827f8bdb746eb/Challenges/Images/Bike/Screenshot_2026-06-03_01-44-20.png)
+
+fixing up the 
+
+# Resources Utilized
+[HackTricks](https://hacktricks.wiki/en/pentesting-web/ssti-server-side-template-injection/index.html#handlebars-nodejsl)
+[Express.js socrey.ai](https://www.sourcery.ai/vulnerabilities/javascript-express-security-express-insecure-template-usage)
+[appcheck-ng.com](https://appcheck-ng.com/template-injection-jsrender-jsviews/)
